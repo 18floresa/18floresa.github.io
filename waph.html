@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WAPH - Angel Flores</title>
+    <link rel="stylesheet" href="https://waph-phung.github.io/style1.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: powderblue;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 5px;
+            font-size: 12px;
+            cursor: pointer; 
+        }
+
+        .round {
+            border-radius: 8px;
+        }
+
+        #response {
+            background-color: #ff9800;
+        }
+
+        #email {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container wrapper">
+        <div id="top">
+            <h1>Web Application Programming and Hacking</h1>
+            <h2>Front-end Web Development Lab 2</h2>
+            <h3>Student: Angel Flores</h3>
+        </div>
+
+        <div id="menubar">
+            <p><a href="#">Home</a> | <a href="#">Contact</a></p>
+        </div>
+
+        <div id="main">
+            <h3>Student: Angel Flores</h3>
+
+            <div id="email" onclick="showhideEmail()">Show My Email</div>
+            <button onclick="showhideEmail()">Show/Hide Email</button>
+
+            <img src="headshot.png" alt="Headshot of Angel Flores" width="150">
+
+            <p style="color: blue; font-style: italic;">Press any key in the box:</p>
+            <input type="text" onkeydown="console.log('Key pressed: ' + event.key)">
+
+            <p>A simple HTML page</p>
+            <p>Using the <a href="https://www.w3schools.com/html">W3Schools template</a></p>
+
+            <button onclick="this.innerHTML = new Date();">Click to show date/time</button>
+
+            <hr>
+            <b>Interaction with forms</b>
+
+            <div>
+                <i>Form with an HTTP GET Request</i>
+                <form action="/echo.php" method="get">
+                    Your input: <input name="data" id="get-data">
+                    <input type="submit" value="Submit">
+                </form>
+                <br>
+
+                <i>Form with an HTTP POST Request</i>
+                <form action="echo.php" method="POST" name="echo_post">
+                    Your input: <input name="data" id="data-post"> 
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+
+            <div id="analogclock-container">
+                <canvas id="analog-clock" width="150" height="150" style="background-color:#999"></canvas>
+            </div>
+
+            <div>
+                <i>AJAX requests</i><br>
+                Your input:
+                <input name="data" id="data" type="text" onkeypress="console.log('You have pressed a key')">
+                <input type="button" class="button round" value="Ajax Echo" onclick="getEcho()">
+                <input type="button" class="button round" value="AjaxQuery GET" id="jquery-echo-btn">
+                <input type="button" class="button round" value="AjaxQuery POST" id="jquery-echo-btn-2">
+                <input class="button round" type="button" value="guess Age" onclick="guessAge($('#data').val())">
+                <div id="response"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="clock.js"></script>
+    <script>
+        // Clock setup
+        window.onload = function () {
+            var canvas = document.getElementById("analog-clock");
+            var ctx = canvas.getContext("2d");
+            var radius = canvas.height / 2;
+            ctx.translate(radius, radius);
+            radius = radius * 0.90;
+            setInterval(drawClock, 1000);
+
+            function drawClock() {
+                drawFace(ctx, radius);
+                drawNumbers(ctx, radius);
+                drawTime(ctx, radius);
+            }
+        };
+
+        // Email toggle
+        let shown = false;
+        function showhideEmail() {
+            const emailDiv = document.getElementById('email');
+            if (shown) {
+                emailDiv.innerHTML = "Show My Email";
+            } else {
+                emailDiv.innerHTML = "<a href='mailto:Floresa18@udayton.edu'>Floresa18@udayton.edu</a>";
+            }
+            shown = !shown;
+        }
+
+        // AJAX Request
+        function getEcho() {
+            const input = document.getElementById("data").value;
+            if (input.length === 0) return;
+
+            const xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    console.log("Received data=" + this.responseText);
+                    document.getElementById("response").innerText = "Response from server: " + this.responseText;
+                }
+            };
+            xhttp.open("GET", "echo.php?data=" + encodeURIComponent(input), true);
+            xhttp.send();
+            document.getElementById("data").value = "";
+        }
+    </script>
+
+    <script>
+        // jQuery Ajax for Joke API
+        $(document).ready(function () {
+            $.get("https://v2.jokeapi.dev/joke/Programming?type=single", function(result) {
+                $("#response").append("<p>A programming joke of the day: " + result.joke + "</p>");
+            });
+
+            // jQuery GET request
+            $("#jquery-echo-btn").click(function () {
+                let data = $("#data").val();
+                $.get("echo.php", { data: data }, function (response) {
+                    $("#response").append("<p>jQuery Get Response: " + response + "</p>");
+                });
+            });
+
+            // jQuery POST request
+            $("#jquery-echo-btn-2").click(function () {
+                let data2 = $("#data").val();
+                $.post("echo.php", { data: data2 }, function (response) {
+                    $("#response").append("<p>jQuery POST Response: " + response + "</p>");
+                });
+            });
+        });
+
+        // Fetch API for Agify.io
+        // async function guessAge(name) {
+        //     const response = await fetch("https://api.agify.io/?name=" + name);
+        //     const result = await response.json();
+        //     $("#response").html("<p><strong>Hi " + name + ", your age should be " + result.age + "</strong></p>");
+        // }
+
+        async function guessAge(name) {
+            if (!name.trim()) {
+                $("#response").text("Please enter a name.");
+                return;
+            }
+
+            try {
+                const response = await fetch("https://api.agify.io/?name=" + encodeURIComponent(name));
+                if (!response.ok) throw new Error("API error");
+
+                const result = await response.json();
+                // Use .text() to prevent XSS
+                $("#response").text(`Hi ${name}, your age should be ${result.age}`);
+            } catch (error) {
+                $("#response").text("Error guessing age. Try again.");
+                console.error("Fetch error:", error);
+            }
+        }
+    </script>
+</body>
+</html>
