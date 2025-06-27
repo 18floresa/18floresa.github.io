@@ -148,7 +148,6 @@
       document.getElementById("digital-clock").textContent = timeString;
     }
 
-    
     let canvas, ctx, radius;
 
     function drawClock() {
@@ -172,6 +171,23 @@
       ctx.strokeStyle = "#333";
       ctx.lineWidth = 4;
       ctx.stroke();
+    }
+
+    function drawNumbers(ctx, radius) {
+      let ang, num;
+      ctx.font = radius * 0.15 + "px arial";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      for (num = 1; num <= 12; num++) {
+        ang = num * Math.PI / 6;
+        ctx.rotate(ang);
+        ctx.translate(0, -radius * 0.85);
+        ctx.rotate(-ang);
+        ctx.fillText(num.toString(), 0, 0);
+        ctx.rotate(ang);
+        ctx.translate(0, radius * 0.85);
+        ctx.rotate(-ang);
+      }
     }
 
     function drawTime(ctx, radius) {
@@ -207,6 +223,7 @@
     function updateAnalogClock() {
       ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
       drawFace(ctx, radius);
+      drawNumbers(ctx, radius);  // ← number drawing added here
       drawTime(ctx, radius);
     }
 
@@ -248,3 +265,6 @@
   </script>
 </body>
 </html>
+
+
+
